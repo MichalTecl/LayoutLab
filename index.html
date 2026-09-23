@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LayoutTest · Hero playground</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="devices.js" defer></script>
+  <script src="placements.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <section class="workspace" aria-label="Nastavení banneru">
+      <div class="editor-panel panel">
+        <div class="panel-heading"><div><span class="step">01</span><h2>Pozadí a focal point</h2></div><button id="reset-focus" class="text-button" type="button">Vrátit na střed ↺</button></div>
+        <div class="source-stage"><div class="source-image-wrap" id="source-wrap"><img id="source-image" alt="Zdrojový hero banner"><button id="focal-point" class="focal-point" type="button" aria-label="Focal point. Posuňte tažením nebo šipkami na klávesnici." title="Posuňte tažením nebo šipkami"><span></span></button></div></div>
+        <div class="focus-bar"><span><span class="small-cross">⊕</span> Klikněte nebo přetáhněte bod v obrázku</span><div class="coordinates"><label>X <input id="focus-x" type="number" min="0" max="100" step="0.1" value="50" aria-label="Focal point X v procentech"> %</label><label>Y <input id="focus-y" type="number" min="0" max="100" step="0.1" value="50" aria-label="Focal point Y v procentech"> %</label></div></div>
+        <label class="upload-row" for="background-file"><span class="upload-icon">↑</span><span><strong>Nahrát vlastní banner</strong><small id="background-info">Ukázkové pozadí · připraveno k vyzkoušení</small></span><span class="file-type">PNG, JPG, WebP, SVG</span><input id="background-file" type="file" accept="image/*"></label>
+      </div>
+      <aside class="settings-panel panel">
+        <div class="panel-heading"><div><span class="step">02</span><h2>Tlačítko nad bannerem</h2></div></div>
+        <label class="button-upload" for="button-file"><span class="button-sample"><img id="button-image" alt="Náhled obrázku tlačítka"></span><strong>Nahrát obrázek tlačítka <span>↑</span></strong><small id="button-info">Ideálně PNG, WebP nebo SVG s průhledností</small><input id="button-file" type="file" accept="image/*"></label>
+        <div class="field"><label for="placement">Umístění tlačítka</label><select id="placement"></select><p id="placement-description" class="field-hint"></p></div>
+        <div class="field"><div class="field-title"><label for="button-width">Šířka tlačítka</label><span><output id="width-value" for="button-width">220</output> px</span></div><input id="button-width" type="range" min="60" max="600" step="5" value="220"><div class="range-labels"><span>60 px</span><span>600 px</span></div></div>
+        <label class="toggle-row"><span>Zobrazit focal point v náhledech</span><input id="show-focus" type="checkbox" role="switch"><span class="toggle" aria-hidden="true"></span></label>
+        <div class="note"><span aria-hidden="true">↗</span><p>Výřez drží focal point co nejblíž středu. U okrajů obrázku se zastaví, aby banner vždy vyplnil obrazovku.</p></div>
+      </aside>
+    </section>
+    <p id="error" class="error" role="alert" hidden></p>
+    <section class="previews" aria-labelledby="previews-heading"><div class="preview-heading"><div><p class="eyebrow">ŽIVÝ NÁHLED</p><h2 id="previews-heading">Malé i velké obrazovky.</h2></div><button id="reset-scroll" class="secondary-button" type="button">Všechny náhledy nahoru ↑</button></div><p class="preview-description">Každý rámeček je samostatná obrazovka. Scrollujte uvnitř a prohlédněte si přechod z banneru do obsahu.</p><div id="device-groups"></div></section>
+    <footer><span><strong>LayoutTest</strong> · prostor pro zkoušení</span><span>Bez ukládání. Obnovením stránky se návrh resetuje.</span></footer>
+  </main>
+</body>
+</html>
