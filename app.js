@@ -8,6 +8,16 @@
   const demoButton = svgUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="88" viewBox="0 0 320 88"><rect x="2" y="2" width="316" height="80" rx="40" fill="#213f33"/><text x="143" y="51" text-anchor="middle" font-family="sans-serif" font-size="19" fill="#fffdf0">Objevte přírodní péči</text><path d="M266 34l9 9-9 9m-15-9h23" fill="none" stroke="#fffdf0" stroke-width="2"/></svg>`);
   const state = { background: demoBackground, imageWidth: 1920, imageHeight: 1080, button: demoButton, buttonRatio: 320 / 88, focalX: .5, focalY: .5, buttonWidth: 220, placement: window.LayoutPlacements[0].id, showFocus: false };
   const previews = [];
+  Object.assign(state, { mode: 'focal', mobile: null, mobileWidth: 0, mobileHeight: 0, showButton: true });
+  const referenceBanners = {
+    background: 'https://www.biorythme.cz/resize/e/1920/10000/files/bannery/bannery-desktop2026-09-12-17-44-43.png',
+    mobile: 'https://www.biorythme.cz/resize/k/450/675/files/bannery/bannery-mobil2026-09-23-13-12-35.png',
+  };
+  const scrollbarProbe = document.createElement('div');
+  scrollbarProbe.style.cssText = 'position:absolute;left:-9999px;width:100px;height:100px;overflow:scroll';
+  document.body.append(scrollbarProbe);
+  const scrollbarWidth = scrollbarProbe.offsetWidth - scrollbarProbe.clientWidth;
+  scrollbarProbe.remove();
   let scheduled = false;
 
   // Tento renderer běží uvnitř každého iframe v jeho plné CSS velikosti.
@@ -19,24 +29,32 @@
     window.addEventListener('message', event => {
       if (event.source !== parent || !event.data || event.data.type !== 'layout-update') return;
       const data = event.data;
+      document.documentElement.classList.toggle('hide-scrollbars', !data.legacy);
       if (data.background) background.src = data.background;
       if (data.button) button.src = data.button;
       Object.assign(background.style, { width: `${data.imageWidth}px`, height: `${data.imageHeight}px`, left: `${data.imageX}px`, top: `${data.imageY}px` });
+      if (data.legacy) Object.assign(background.style, { width: '100%', height: '100%', left: '0px', top: '0px', objectFit: 'cover', objectPosition: 'left top' });
       Object.assign(button.style, { width: `${data.buttonWidth}px`, height: `${data.buttonHeight}px`, left: `${data.buttonX}px`, top: `${data.buttonY}px` });
+      button.style.display = data.showButton ? 'block' : 'none';
       Object.assign(focus.style, { left: `${data.focalX}px`, top: `${data.focalY}px`, display: data.showFocus ? 'block' : 'none' });
       if (data.resetScroll) window.scrollTo(0, 0);
     });
     parent.postMessage({ type: 'layout-ready' }, '*');
   }
-  const previewDocument = `<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}html{scrollbar-width:none}html::-webkit-scrollbar{display:none}body{margin:0;background:#faf9f4;color:#304638;font-family:system-ui,sans-serif}.hero{height:100vh;width:100%;position:relative;overflow:hidden;background:#c5cfb3}#background,#cta{position:absolute;display:block;max-width:none}#cta{object-fit:contain}#focus{position:absolute;width:26px;height:26px;border:2px solid white;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 5px #29433055;pointer-events:none}#focus:before,#focus:after{content:'';position:absolute;background:white}#focus:before{height:36px;width:2px;top:-7px;left:10px}#focus:after{width:36px;height:2px;left:-7px;top:10px}.content{max-width:1000px;margin:auto;padding:clamp(28px,6vw,90px);min-height:100vh}.eyebrow{font-size:12px;letter-spacing:3px;color:#839075}h1{font:normal clamp(30px,4vw,52px) Georgia,serif;margin:20px 0 25px}p{font-size:17px;line-height:1.9;color:#73816c}.line{width:50px;height:2px;background:#a6b091;margin:30px 0}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:20px;margin-top:40px}.card{background:#edf0e5;border-radius:12px;padding:24px}.card p{font-size:14px;margin-bottom:0}</style></head><body><section class="hero" aria-label="Náhled hero banneru"><img id="background" alt="Pozadí banneru"><img id="cta" alt="Grafické tlačítko"><span id="focus" style="display:none"></span></section><section class="content"><span class="eyebrow">OBSAH POD BANNEREM</span><h1>Prostor pro další příběh.</h1><div class="line"></div><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus vitae mi at tellus posuere feugiat. Nulla facilisi. Praesent aliquam, neque sed finibus consequat, tellus lorem ornare velit, eget luctus arcu felis sed ante.</p><p>Donec dignissim purus ut justo tincidunt, ac viverra metus consectetur. Curabitur vel sapien id lacus interdum tincidunt. Suspendisse potenti.</p><div class="cards"><div class="card"><strong>Lorem ipsum</strong><p>Integer vitae erat vitae libero posuere tincidunt. Mauris ornare justo non felis.</p></div><div class="card"><strong>Dolor sit amet</strong><p>Aliquam erat volutpat. Nunc id erat consequat, vulputate sapien et, viverra dui.</p></div></div></section><script>(${previewRuntime.toString()})();<\/script></body></html>`;
+  const previewDocument = `<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}html.hide-scrollbars{scrollbar-width:none}html.hide-scrollbars::-webkit-scrollbar{display:none}body{margin:0;background:#faf9f4;color:#304638;font-family:system-ui,sans-serif}.hero{height:100vh;width:100%;position:relative;overflow:hidden;background:#c5cfb3}#background,#cta{position:absolute;display:block;max-width:none}#cta{object-fit:contain}#focus{position:absolute;width:26px;height:26px;border:2px solid white;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 5px #29433055;pointer-events:none}#focus:before,#focus:after{content:'';position:absolute;background:white}#focus:before{height:36px;width:2px;top:-7px;left:10px}#focus:after{width:36px;height:2px;left:-7px;top:10px}.content{max-width:1000px;margin:auto;padding:clamp(28px,6vw,90px);min-height:100vh}.eyebrow{font-size:12px;letter-spacing:3px;color:#839075}h1{font:normal clamp(30px,4vw,52px) Georgia,serif;margin:20px 0 25px}p{font-size:17px;line-height:1.9;color:#73816c}.line{width:50px;height:2px;background:#a6b091;margin:30px 0}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:20px;margin-top:40px}.card{background:#edf0e5;border-radius:12px;padding:24px}.card p{font-size:14px;margin-bottom:0}</style></head><body><section class="hero" aria-label="Náhled hero banneru"><img id="background" alt="Pozadí banneru"><img id="cta" alt="Grafické tlačítko"><span id="focus" style="display:none"></span></section><section class="content"><span class="eyebrow">OBSAH POD BANNEREM</span><h1>Prostor pro další příběh.</h1><div class="line"></div><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus vitae mi at tellus posuere feugiat. Nulla facilisi. Praesent aliquam, neque sed finibus consequat, tellus lorem ornare velit, eget luctus arcu felis sed ante.</p><p>Donec dignissim purus ut justo tincidunt, ac viverra metus consectetur. Curabitur vel sapien id lacus interdum tincidunt. Suspendisse potenti.</p><div class="cards"><div class="card"><strong>Lorem ipsum</strong><p>Integer vitae erat vitae libero posuere tincidunt. Mauris ornare justo non felis.</p></div><div class="card"><strong>Dolor sit amet</strong><p>Aliquam erat volutpat. Nunc id erat consequat, vulputate sapien et, viverra dui.</p></div></div></section><script>(${previewRuntime.toString()})();<\/script></body></html>`;
 
   function layoutFor(device) {
-    const { width, height } = device;
-    const scale = Math.max(width / state.imageWidth, height / state.imageHeight);
-    const imageWidth = state.imageWidth * scale;
-    const imageHeight = state.imageHeight * scale;
-    const imageX = clamp(width / 2 - state.focalX * imageWidth, width - imageWidth, 0);
-    const imageY = clamp(height / 2 - state.focalY * imageHeight, height - imageHeight, 0);
+    const legacy = state.mode === 'biorythme';
+    const { height } = device;
+    const width = device.width - (legacy ? scrollbarWidth : 0);
+    const mobile = legacy && device.width <= 450 && state.mobile;
+    const sourceWidth = mobile ? state.mobileWidth : state.imageWidth;
+    const sourceHeight = mobile ? state.mobileHeight : state.imageHeight;
+    const scale = Math.max(width / sourceWidth, height / sourceHeight);
+    const imageWidth = sourceWidth * scale;
+    const imageHeight = sourceHeight * scale;
+    const imageX = legacy ? 0 : clamp(width / 2 - state.focalX * imageWidth, width - imageWidth, 0);
+    const imageY = legacy ? 0 : clamp(height / 2 - state.focalY * imageHeight, height - imageHeight, 0);
     const focalX = imageX + state.focalX * imageWidth;
     const focalY = imageY + state.focalY * imageHeight;
     const gap = Math.min(48, width * .06, height * .06);
@@ -45,14 +63,15 @@
     const buttonHeight = buttonWidth / state.buttonRatio;
     const placement = window.LayoutPlacements.find(item => item.id === state.placement);
     const position = placement.getPosition({ width, height, buttonWidth, buttonHeight, focalX, focalY, gap });
-    return { type: 'layout-update', imageWidth, imageHeight, imageX, imageY, focalX, focalY, buttonWidth, buttonHeight, buttonX: clamp(position.x, gap, width - buttonWidth - gap), buttonY: clamp(position.y, gap, height - buttonHeight - gap), showFocus: state.showFocus };
+    return { type: 'layout-update', legacy, showButton: state.showButton, imageWidth, imageHeight, imageX, imageY, focalX, focalY, buttonWidth, buttonHeight, buttonX: clamp(position.x, gap, width - buttonWidth - gap), buttonY: clamp(position.y, gap, height - buttonHeight - gap), showFocus: state.showFocus && !legacy };
   }
   function renderPreview(preview, resetScroll = false, forceAssets = false) {
     const data = { ...layoutFor(preview.device), resetScroll };
     for (const kind of ['background', 'button']) {
-      if (forceAssets || preview[kind] !== state[kind]) {
-        data[kind] = state[kind];
-        preview[kind] = state[kind];
+      const asset = kind === 'background' && state.mode === 'biorythme' && preview.device.width <= 450 && state.mobile ? state.mobile : state[kind];
+      if (forceAssets || preview[kind] !== asset) {
+        data[kind] = asset;
+        preview[kind] = asset;
       }
     }
     preview.frame.contentWindow.postMessage(data, '*');
@@ -171,6 +190,46 @@
     scheduleRender();
   });
   $('show-focus').addEventListener('change', event => { state.showFocus = event.target.checked; scheduleRender(); });
+  $('show-button').addEventListener('change', event => { state.showButton = event.target.checked; scheduleRender(); });
+  function changeMode() {
+    state.mode = $('layout-mode').value;
+    const legacy = state.mode === 'biorythme';
+    $('mobile-settings').hidden = !legacy;
+    $('focal-point').hidden = legacy;
+    $('source-wrap').classList.toggle('static-crop', legacy);
+    for (const id of ['focus-x', 'focus-y', 'reset-focus', 'show-focus']) $(id).disabled = legacy;
+    document.querySelector('.focus-bar').hidden = legacy;
+    state.showButton = !legacy;
+    $('show-button').checked = state.showButton;
+    $('layout-description').textContent = legacy ? 'Cover, zarovnání vlevo nahoře, výška celého viewportu. Do 450 px včetně se přepne na mobilní banner. Focal point se nepoužívá.' : 'Jeden obrázek pro všechny rozměry. Výřez sleduje focal point.';
+    $('layout-note').textContent = legacy ? 'Současné bannery mají tlačítko už v obrázku. Samostatné tlačítko je proto vypnuté; můžete ho zapnout pro vlastní experiment. Pravidla ověřena 29. 9. 2026.' : 'Výřez drží focal point co nejblíž středu. U okrajů obrázku se zastaví, aby banner vždy vyplnil obrazovku.';
+    render(true);
+  }
+  $('layout-mode').addEventListener('change', changeMode);
+  $('load-biorythme').addEventListener('click', async () => {
+    const trigger = $('load-biorythme');
+    trigger.disabled = true;
+    try {
+      const images = await Promise.all(Object.values(referenceBanners).map(async url => {
+        const image = new Image(); image.src = url; await image.decode(); return image;
+      }));
+      state.background = referenceBanners.background;
+      state.mobile = referenceBanners.mobile;
+      [state.imageWidth, state.imageHeight] = [images[0].naturalWidth, images[0].naturalHeight];
+      [state.mobileWidth, state.mobileHeight] = [images[1].naturalWidth, images[1].naturalHeight];
+      $('source-image').src = state.background;
+      $('mobile-image').src = state.mobile;
+      $('mobile-image').hidden = false;
+      $('background-info').textContent = `Biorythme · ${state.imageWidth} × ${state.imageHeight} px · stav 29. 9. 2026`;
+      $('mobile-info').textContent = `Biorythme · ${state.mobileWidth} × ${state.mobileHeight} px · stav 29. 9. 2026`;
+      $('layout-mode').value = 'biorythme';
+      $('error').hidden = true;
+      changeMode();
+    } catch {
+      $('error').textContent = 'Bannery Biorythme nejsou dostupné. Nahrajte desktopový a mobilní obrázek ručně; původní návrh zůstal zachován.';
+      $('error').hidden = false;
+    } finally { trigger.disabled = false; }
+  });
   $('reset-focus').addEventListener('click', () => updateFocus(.5, .5));
   $('reset-scroll').addEventListener('click', () => render(true));
   ['x', 'y'].forEach(axis => {
@@ -188,6 +247,7 @@
     if (rect.width && rect.height) updateFocus((event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
   }
   source.addEventListener('pointerdown', event => {
+    if (state.mode === 'biorythme') return;
     if (event.button !== 0 || activePointer !== null) return;
     event.preventDefault();
     activePointer = event.pointerId;
@@ -233,6 +293,11 @@
           state.imageHeight = image.naturalHeight;
           $('source-image').src = dataUrl;
           updateFocus(.5, .5);
+        } else if (kind === 'mobile') {
+          state.mobileWidth = image.naturalWidth;
+          state.mobileHeight = image.naturalHeight;
+          $('mobile-image').src = dataUrl;
+          $('mobile-image').hidden = false;
         } else {
           state.buttonRatio = image.naturalWidth / image.naturalHeight;
           $('button-image').src = dataUrl;
@@ -255,6 +320,8 @@
   $('button-image').src = state.button;
   wireUpload('background');
   wireUpload('button');
+  wireUpload('mobile');
   buildPreviews();
   changePlacement();
 })();
+

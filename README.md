@@ -11,7 +11,17 @@ Statický nástroj pro zkoušení celoobrazovkového hero banneru. Otevřete `in
 
 Obrázky zůstávají v paměti prohlížeče. Obnovení stránky návrh zruší. Ukázková grafika je součástí aplikace a slouží pouze k testování rozložení.
 
-## Konfigurace
+## Srovnání se současným Biorythme
+
+V editoru lze přepnout mezi návrhem s focal pointem a režimem **Současné Biorythme**. Ten vychází z živého webu ověřeného 29. 9. 2026: výška banneru odpovídá viewportu, obrázek vyplňuje banner pomocí `cover` a je zarovnaný vlevo nahoře. Při šířce viewportu do 450 CSS px včetně se použije samostatný mobilní obrázek. Při chybějícím mobilním obrázku se použije hlavní obrázek a editor na to upozorní.
+
+Tlačítko **Načíst bannery Biorythme (29. 9. 2026)** načte tehdejší zveřejněné soubory přímo z Biorythme: desktop 1900 × 923 px, mobil 450 × 675 px. Vyžaduje internet a dostupnost těchto souborů; nejde o automatické sledování budoucích změn webu. Vlastní soubory dál zůstávají jen v paměti prohlížeče. Samostatné tlačítko je v tomto režimu standardně vypnuté, protože referenční grafika ho již obsahuje.
+
+Režim napodobuje vykreslení publikovaného obrázku, nikoliv serverové zpracování původního uploadu. Pro přesné srovnání použijte stejný soubor jako živý web. Zohledňuje také šířku nativního scrollbaru aktuálního prohlížeče. Hlavičku, menu, cookies a další překryvné prvky Biorythme nereprodukuje. Výška mobilních lišt a chování Safari zůstávají mimo rozsah náhledů.
+
+Zdroj pravidel: [Biorythme](https://www.biorythme.cz/), CSS prvku `.bigban` a media query `max-width: 450px`.
+
+## Konfigurace souborů
 
 - `devices.js`: seznam viewportů v CSS pixelech. Přidáním položky se vytvoří další náhled. Volitelné pole `example` uvádí příklad skutečného zařízení pod názvem náhledu. Součástí je 3× desktop, 6× tablet (na výšku i šířku) a 5× mobil.
 - `placements.js`: varianty umístění tlačítka. Každá má `id`, `label`, `description` a funkci `getPosition`, která vrací levý horní roh v CSS pixelech. Dostává velikost viewportu, tlačítka, promítnutý focal point a bezpečný okraj `gap`.

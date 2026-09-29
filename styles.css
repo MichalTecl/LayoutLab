@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;750;800&display=swap');
 :root { color-scheme: light; --ink: #223c37; --muted: #73817b; --line: #e1e6df; --green: #245a49; --paper: #f7f8f4; }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'DM Sans', system-ui, sans-serif; font-size: 14px; }
 button, input, select { font: inherit; }
 button, select, label[for$='-file'] { cursor: pointer; }
@@ -29,4 +30,11 @@ footer { display: flex; justify-content: space-between; gap: 18px; border-top: 1
 @media(max-width:1100px) { .workspace { grid-template-columns: minmax(0,1.5fr) minmax(270px,1fr); }.panel { padding: 18px; }.file-type { display: none; }.device-grid.mobile { grid-template-columns: repeat(3,minmax(0,1fr)); }.device-grid { gap: 14px; }.version { display: none; } }
 @media(max-width:760px) { main { padding-top: 30px; }.workspace { grid-template-columns: 1fr; }.brand-detail,.brand-separator,.local-badge { display: none; }.topbar { min-height: 64px; }.source-stage { height: 280px; }.source-image-wrap>img { max-height: 260px; }.device-grid { grid-template-columns: 1fr; }.device-grid.mobile { grid-template-columns: repeat(2,minmax(0,1fr)); }.preview-heading { align-items: start; flex-direction: column; }.panel-heading h2 { font-size: 12px; }.preview-heading h2 { font-size: 24px; }footer { flex-direction: column; }.device-card { padding: 10px; } }
 .device-example { display: block; margin-top: 4px; font-size: 10px; line-height: 1.4; color: var(--muted); overflow-wrap: anywhere; }
+.layout-mode-field { margin: 0 0 10px; }
+.reference-button { margin-bottom: 18px; }
+.mobile-upload { margin: 14px 0 8px; }
+.mobile-upload img { width: 42px; max-height: 65px; object-fit: contain; }
+.button-visibility { margin: 0 0 18px; padding: 0; border: 0; }
+.source-image-wrap.static-crop { cursor: default; }
+button:disabled { cursor: default; opacity: .5; }
 @media(prefers-reduced-motion:reduce) { * { transition: none !important; } }
